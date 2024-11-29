@@ -27,9 +27,9 @@ export default function RootLayout({
         {/* Test with regular img tag */}
         <div className="fixed inset-0 pointer-events-none">
           <img
-            src="/backfround-logo.png"
+            src="/background-logo.png"
             alt="Ball4Life Logo"
-            className="mx-auto mt-20 w-[400px] h-[400px] object-contain"
+            className="mx-auto mt-20 w-[400px] h-[400px] object-contain z-50"
           />
         </div>
 

@@ -1,54 +1,35 @@
 'use client';
+import { useState, useMemo } from 'react';
+import TimeSlotTable from './TimeSlotTable';
+import { allTimeSlots, dates, timeRanges } from '@/lib/data';
+import Dropdown from './DropDown';
 
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
-import type { TimeSlot } from '@/lib/types';
-
-export default function SlotBooking() {
-  const [selectedDate, setSelectedDate] = useState('Friday, November 29');
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState('6:00-12:00 PM');
+const SlotBooking = () => {
+  const [selectedDate, setSelectedDate] = useState(dates[0]);
+  const [selectedTimeRange, setSelectedTimeRange] = useState(
+    timeRanges[0].label
+  );
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
 
-  const dateDropdownRef = useRef<HTMLDivElement>(null);
-  const timeDropdownRef = useRef<HTMLDivElement>(null);
+  // Filter time slots based on selected time range
+  const filteredTimeSlots = useMemo(() => {
+    const selectedRange = timeRanges.find(
+      (range) => range.label === selectedTimeRange
+    );
+    if (!selectedRange) return [];
 
-  const dates = [
-    'Friday, November 29',
-    'Saturday, November 30',
-    'Sunday, December 1',
-  ];
+    return allTimeSlots.filter((slot) => {
+      const hour = parseInt(slot.time.split(':')[0]);
+      const isPM = slot.time.includes('PM');
+      let hourIn24 = hour;
 
-  const timeRanges = ['6:00-12:00 PM', '12:00-5:00 PM', '5:00-10:00 PM'];
+      if (isPM && hour !== 12) hourIn24 += 12;
+      if (!isPM && hour === 12) hourIn24 = 0;
 
-  const timeSlots: TimeSlot[] = [
-    { time: '6:00-7:00 AM', status: 'Available' },
-    { time: '7:00-8:00 AM', status: 'Available' },
-    { time: '8:00-9:00 AM', status: 'Booked' },
-    { time: '9:00-10:00 AM', status: 'Available' },
-    { time: '10:00-11:00 AM', status: 'Available' },
-    { time: '11:00-12:00 PM', status: 'Available' },
-  ];
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dateDropdownRef.current &&
-        !dateDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDateDropdownOpen(false);
-      }
-      if (
-        timeDropdownRef.current &&
-        !timeDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsTimeDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+      return hourIn24 >= selectedRange.start && hourIn24 < selectedRange.end;
+    });
+  }, [selectedTimeRange]);
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -57,127 +38,36 @@ export default function SlotBooking() {
           Check Slot Availability
         </h2>
 
-        {/* Date Selection */}
-        <div className="mb-6 relative" ref={dateDropdownRef}>
-          <label className="block text-sm text-gray-400 mb-2">
-            Select Date
-          </label>
-          <div
-            onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-            className="flex justify-between items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors duration-200 cursor-pointer text-white"
-          >
-            <span>{selectedDate}</span>
-            <ChevronDown
-              className={`w-5 h-5 transform transition-transform duration-200 ${
-                isDateDropdownOpen ? 'rotate-180' : ''
-              }`}
-            />
-          </div>
+        <Dropdown
+          label="Select Date"
+          value={selectedDate}
+          options={dates}
+          isOpen={isDateDropdownOpen}
+          onToggle={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+          onSelect={(date) => {
+            setSelectedDate(date);
+            setIsDateDropdownOpen(false);
+          }}
+          onClickOutside={() => setIsDateDropdownOpen(false)}
+        />
 
-          {isDateDropdownOpen && (
-            <div className="absolute z-10 mt-2 w-full bg-gray-800 rounded-lg shadow-xl border border-gray-700 animate-dropdown text-white">
-              {dates.map((date, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setSelectedDate(date);
-                    setIsDateDropdownOpen(false);
-                  }}
-                  className="p-3 hover:bg-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"
-                >
-                  {date}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <Dropdown
+          label="Select Time Range"
+          value={selectedTimeRange}
+          options={timeRanges.map((range) => range.label)}
+          isOpen={isTimeDropdownOpen}
+          onToggle={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+          onSelect={(time) => {
+            setSelectedTimeRange(time);
+            setIsTimeDropdownOpen(false);
+          }}
+          onClickOutside={() => setIsTimeDropdownOpen(false)}
+        />
 
-        {/* Time Range Selection */}
-        <div className="mb-6 relative" ref={timeDropdownRef}>
-          <label className="block text-sm text-gray-400 mb-2">
-            Select Time Range
-          </label>
-          <div
-            onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
-            className="flex justify-between items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors duration-200 cursor-pointer text-white"
-          >
-            <span>{selectedTimeSlot}</span>
-            <ChevronDown
-              className={`w-5 h-5 transform transition-transform duration-200 ${
-                isTimeDropdownOpen ? 'rotate-180' : ''
-              }`}
-            />
-          </div>
-
-          {isTimeDropdownOpen && (
-            <div className="absolute z-10 mt-2 w-full bg-gray-800 rounded-lg shadow-xl border border-gray-700 animate-dropdown text-white">
-              {timeRanges.map((time, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setSelectedTimeSlot(time);
-                    setIsTimeDropdownOpen(false);
-                  }}
-                  className="p-3 hover:bg-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg"
-                >
-                  {time}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Slots Table */}
-        <div className="overflow-hidden rounded-lg border border-gray-800">
-          <table className="w-full">
-            <thead className="bg-gray-800">
-              <tr>
-                <th className="p-4 text-left text-sm font-semibold text-white">
-                  TIME
-                </th>
-                <th className="p-4 text-left text-sm font-semibold text-white">
-                  STATUS
-                </th>
-                <th className="p-4 text-left text-sm font-semibold text-white">
-                  ACTIONS
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {timeSlots.map((slot, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors duration-200"
-                >
-                  <td className="p-4 text-white">{slot.time}</td>
-                  <td className="p-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-sm ${
-                        slot.status === 'Available'
-                          ? 'bg-green-900/50 text-green-400'
-                          : 'bg-red-900/50 text-red-400'
-                      }`}
-                    >
-                      {slot.status}
-                    </span>
-                  </td>
-                  <td className="p-4">
-                    {slot.status === 'Available' ? (
-                      <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200">
-                        Book
-                      </button>
-                    ) : (
-                      <span className="px-4 py-2 bg-red-900/50 text-red-400 rounded-md">
-                        Booked
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TimeSlotTable slots={filteredTimeSlots} />
       </div>
     </div>
   );
-}
+};
+
+export default SlotBooking;

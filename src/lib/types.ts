@@ -1,8 +1,7 @@
-export interface TimeSlot {
+export type TimeSlot = {
   time: string;
   status: 'Available' | 'Booked';
-}
-
+};
 export interface DateRange {
   start: string;
   end: string;
