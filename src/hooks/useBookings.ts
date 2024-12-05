@@ -63,6 +63,7 @@ export const useBookings = () => {
         ...doc.data(),
       }));
     } catch (err) {
+      console.error(err);
       setError('Failed to fetch bookings');
       return [];
     }
