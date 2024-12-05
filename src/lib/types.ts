@@ -1,6 +1,9 @@
+// types.ts
+export type SlotStatus = 'Unavailable' | 'Available' | 'Booked';
+
 export interface TimeSlot {
   time: string;
-  status: 'Available' | 'Booked';
+  status: SlotStatus;
   bookedBy: string | null;
 }
 export interface DateRange {

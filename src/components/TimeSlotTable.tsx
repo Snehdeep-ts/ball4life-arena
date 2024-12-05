@@ -17,14 +17,7 @@ const TimeSlotTable = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
 
-  if (slots.length === 0) {
-    return (
-      <div className="text-center p-4 text-gray-400">
-        No time slots available for the selected range.
-      </div>
-    );
-  }
-
+  // Remove the empty slots check since we'll always have slots now
   return (
     <>
       <div className="overflow-hidden rounded-lg border border-gray-800">
@@ -62,10 +55,12 @@ const TimeSlotTable = ({
                       >
                         Book Slot
                       </button>
-                    ) : (
+                    ) : slot.status === 'Booked' ? (
                       <span className="text-gray-400">
                         Booked by {slot.bookedBy || 'someone'}
                       </span>
+                    ) : (
+                      <span className="text-gray-500">Unavailable</span>
                     )}
                   </div>
                 </td>
