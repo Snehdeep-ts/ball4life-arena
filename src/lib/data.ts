@@ -30,6 +30,7 @@ const generateBaseTimeSlots = (): TimeSlot[] => {
     slots.push({
       time: timeString,
       status: 'Available',
+      bookedBy: null,
     });
   }
   return slots;
@@ -51,6 +52,7 @@ export const getTimeSlotsWithBookings = async (
       const slotIndex = slots.findIndex((slot) => slot.time === booking.time);
       if (slotIndex !== -1) {
         slots[slotIndex].status = 'Booked';
+        slots[slotIndex].bookedBy = booking.name; // Add the booker's name
       }
     });
 

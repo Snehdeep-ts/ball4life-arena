@@ -6,7 +6,7 @@ import BookingModal from './BookingModal';
 interface TimeSlotTableProps {
   slots: TimeSlot[];
   selectedDate: string;
-  onBookingSuccess: () => void; // Add this
+  onBookingSuccess: () => void;
 }
 
 const TimeSlotTable = ({
@@ -38,6 +38,9 @@ const TimeSlotTable = ({
                 STATUS
               </th>
               <th className="p-4 text-left text-sm font-semibold text-white">
+                BOOKED BY
+              </th>
+              <th className="p-4 text-left text-sm font-semibold text-white">
                 ACTIONS
               </th>
             </tr>
@@ -60,6 +63,7 @@ const TimeSlotTable = ({
                     {slot.status}
                   </span>
                 </td>
+                <td className="p-4 text-white">{slot.bookedBy || '-'}</td>
                 <td className="p-4">
                   {slot.status === 'Available' ? (
                     <button
@@ -89,7 +93,7 @@ const TimeSlotTable = ({
           setIsModalOpen(false);
           setSelectedSlot(null);
         }}
-        onSuccess={onBookingSuccess} // Add this
+        onSuccess={onBookingSuccess}
         selectedSlot={selectedSlot}
         selectedDate={selectedDate}
       />
