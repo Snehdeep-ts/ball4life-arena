@@ -69,7 +69,8 @@ const generateBaseTimeSlots = (selectedDate: string): TimeSlot[] => {
   try {
     if (selectedDate.includes(',')) {
       // Handle format like "Friday, December 5"
-      const [dayName, monthAndDay] = selectedDate.split(', ');
+      const monthAndDay = selectedDate.split(', ')[1];
+
       const [monthName, dayStr] = monthAndDay.split(' ');
       selected = new Date(
         currentDate.getFullYear(),
@@ -90,7 +91,6 @@ const generateBaseTimeSlots = (selectedDate: string): TimeSlot[] => {
   // Current date for comparison
   const today = new Date();
   const currentHour = today.getHours();
-  const currentMinute = today.getMinutes();
 
   // Set today to start of day for comparison
   const todayStart = new Date();
